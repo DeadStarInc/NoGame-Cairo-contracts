@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+protostar test tests/test_$1.cairo

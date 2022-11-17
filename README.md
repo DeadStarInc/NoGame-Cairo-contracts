@@ -35,7 +35,7 @@ protostar install https://github.com/OpenZeppelin/cairo-contracts
 ### Testing:
 
 ```
-protostar test
+./test test_name (without prepending 'test' and without appending '.cairo')
 ```
 
 ### Compile
