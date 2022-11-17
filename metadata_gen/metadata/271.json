@@ -1,0 +1,23 @@
+{
+    "image": "ipfs://QmcTXgGCiMpNKeYP9aQs5hAuUPzeWumrARoc4og2wnFECp/1.png",
+    "tokenId": 271,
+    "name": "NoGame v0.2 #271",
+    "attributes": [
+        {
+            "trait_type": "size",
+            "value": 165
+        },
+        {
+            "trait_type": "temperature",
+            "value": 253
+        },
+        {
+            "trait_type": "type",
+            "value": "Forest planet"
+        },
+        {
+            "trait_type": "position",
+            "value": 1
+        }
+    ]
+}

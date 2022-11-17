@@ -1,0 +1,23 @@
+{
+    "image": "ipfs://QmcTXgGCiMpNKeYP9aQs5hAuUPzeWumrARoc4og2wnFECp/14.png",
+    "tokenId": 404,
+    "name": "NoGame v0.2 #404",
+    "attributes": [
+        {
+            "trait_type": "size",
+            "value": 120
+        },
+        {
+            "trait_type": "temperature",
+            "value": -73
+        },
+        {
+            "trait_type": "type",
+            "value": "Carbon planet"
+        },
+        {
+            "trait_type": "position",
+            "value": 14
+        }
+    ]
+}

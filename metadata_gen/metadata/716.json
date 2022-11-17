@@ -1,0 +1,23 @@
+{
+    "image": "ipfs://QmcTXgGCiMpNKeYP9aQs5hAuUPzeWumrARoc4og2wnFECp/11.png",
+    "tokenId": 716,
+    "name": "NoGame v0.2 #716",
+    "attributes": [
+        {
+            "trait_type": "size",
+            "value": 207
+        },
+        {
+            "trait_type": "temperature",
+            "value": 25
+        },
+        {
+            "trait_type": "type",
+            "value": "Gas giant"
+        },
+        {
+            "trait_type": "position",
+            "value": 11
+        }
+    ]
+}

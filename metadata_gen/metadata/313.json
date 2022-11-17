@@ -1,0 +1,23 @@
+{
+    "image": "ipfs://QmcTXgGCiMpNKeYP9aQs5hAuUPzeWumrARoc4og2wnFECp/13.png",
+    "tokenId": 313,
+    "name": "NoGame v0.2 #313",
+    "attributes": [
+        {
+            "trait_type": "size",
+            "value": 146
+        },
+        {
+            "trait_type": "temperature",
+            "value": -44
+        },
+        {
+            "trait_type": "type",
+            "value": "Helium planet"
+        },
+        {
+            "trait_type": "position",
+            "value": 13
+        }
+    ]
+}

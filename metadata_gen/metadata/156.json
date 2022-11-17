@@ -1,0 +1,23 @@
+{
+    "image": "ipfs://QmcTXgGCiMpNKeYP9aQs5hAuUPzeWumrARoc4og2wnFECp/6.png",
+    "tokenId": 156,
+    "name": "NoGame v0.2 #156",
+    "attributes": [
+        {
+            "trait_type": "size",
+            "value": 192
+        },
+        {
+            "trait_type": "temperature",
+            "value": 81
+        },
+        {
+            "trait_type": "type",
+            "value": "Chthonian planet"
+        },
+        {
+            "trait_type": "position",
+            "value": 6
+        }
+    ]
+}

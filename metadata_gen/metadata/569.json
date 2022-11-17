@@ -1,0 +1,23 @@
+{
+    "image": "ipfs://QmcTXgGCiMpNKeYP9aQs5hAuUPzeWumrARoc4og2wnFECp/14.png",
+    "tokenId": 569,
+    "name": "NoGame v0.2 #569",
+    "attributes": [
+        {
+            "trait_type": "size",
+            "value": 147
+        },
+        {
+            "trait_type": "temperature",
+            "value": -59
+        },
+        {
+            "trait_type": "type",
+            "value": "Carbon planet"
+        },
+        {
+            "trait_type": "position",
+            "value": 14
+        }
+    ]
+}

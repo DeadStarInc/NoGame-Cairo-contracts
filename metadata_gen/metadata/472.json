@@ -1,0 +1,23 @@
+{
+    "image": "ipfs://QmcTXgGCiMpNKeYP9aQs5hAuUPzeWumrARoc4og2wnFECp/7.png",
+    "tokenId": 472,
+    "name": "NoGame v0.2 #472",
+    "attributes": [
+        {
+            "trait_type": "size",
+            "value": 165
+        },
+        {
+            "trait_type": "temperature",
+            "value": 45
+        },
+        {
+            "trait_type": "type",
+            "value": "Eccentric Jupiter"
+        },
+        {
+            "trait_type": "position",
+            "value": 7
+        }
+    ]
+}

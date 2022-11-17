@@ -1,0 +1,23 @@
+{
+    "image": "ipfs://QmcTXgGCiMpNKeYP9aQs5hAuUPzeWumrARoc4og2wnFECp/0.png",
+    "tokenId": 585,
+    "name": "NoGame v0.2 #585",
+    "attributes": [
+        {
+            "trait_type": "size",
+            "value": 94
+        },
+        {
+            "trait_type": "temperature",
+            "value": -108
+        },
+        {
+            "trait_type": "type",
+            "value": "Brown dwarf"
+        },
+        {
+            "trait_type": "position",
+            "value": 15
+        }
+    ]
+}

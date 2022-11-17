@@ -1,0 +1,23 @@
+{
+    "image": "ipfs://QmcTXgGCiMpNKeYP9aQs5hAuUPzeWumrARoc4og2wnFECp/8.png",
+    "tokenId": 593,
+    "name": "NoGame v0.2 #593",
+    "attributes": [
+        {
+            "trait_type": "size",
+            "value": 223
+        },
+        {
+            "trait_type": "temperature",
+            "value": 68
+        },
+        {
+            "trait_type": "type",
+            "value": "Ammonia planet"
+        },
+        {
+            "trait_type": "position",
+            "value": 8
+        }
+    ]
+}

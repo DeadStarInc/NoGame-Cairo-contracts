@@ -1,0 +1,97 @@
+#!/usr/bin/bash
+ADMIN='0x003bcD035C914F0D990e260b1483D0c45256dcDECAcf08FeD7d513F395608973'
+URI='105 112 102 115 58 47 47 81 109 90 81 122 101 83 120 54 109 53 56 88 52 80 97 122 53 81 49 118 69 49 69 57 100 105 100 115 98 119 75 71 116 70 118 116 77 74 89 101 89 120 97 100 71 47'
+clean() {
+    /usr/bin/rm -rf ./build/*
+}
+
+reset() {
+    /usr/bin/rm ./deploy.txt
+}
+
+build() {
+    protostar build
+}
+
+deploy() {
+    touch deploy.txt
+
+    stdout=$(protostar deploy './build/minter.json' --network alpha-goerli --inputs $ADMIN 2>&1 )
+    minter=$(echo ${stdout}  | grep -o -P '(?<=Contract address: ).*(?= Transaction hash:)')
+    echo 'minter::'${minter}
+    echo 'minter::'${minter} >> deploy.txt
+    echo 'Deployed Minter...'
+
+    stdout=$(protostar deploy ./build/erc721.json --network alpha-goerli --inputs  0x4e6f47616d6520 0x4f474d302e31 $minter 54 $URI 2>&1 )
+    erc721=$(echo ${stdout}  | grep -o -P '(?<=Contract address: ).*(?= Transaction hash:)')
+    echo 'erc721$::'${erc721}
+    echo 'erc721$::'${erc721} >> deploy.txt
+    echo 'Deployed ERC721...'
+
+    stdout=$(protostar deploy ./build/manager.json --network alpha-goerli --inputs $ADMIN 2>&1 )
+    manager=$(echo ${stdout}  | grep -o -P '(?<=Contract address: ).*(?= Transaction hash:)')
+    echo 'manager::'${manager}
+    echo 'manager::'${manager} >> deploy.txt
+    echo 'Deployed Modules Manager...'
+
+    stdout=$(protostar deploy ./build/main.json --network alpha-goerli --inputs $ADMIN $manager 2>&1 )
+    game=$(echo ${stdout}  | grep -o -P '(?<=Contract address: ).*(?= Transaction hash:)')
+    echo 'game::'${game}
+    echo 'game::'${game} >> deploy.txt
+    echo 'Deployed NoGame...'
+
+    stdout=$(protostar deploy ./build/erc20.json --network alpha-goerli --inputs 0x4e472d4d6574616c 0x4e4776302e322d4d 18 0 0 $game $game 2>&1 )
+    metal=$(echo ${stdout}  | grep -o -P '(?<=Contract address: ).*(?= Transaction hash:)')
+    echo 'metal::'${metal}
+    echo 'metal::'${metal} >> deploy.txt
+    echo 'Deployed ERC20 Metal...'
+
+    stdout=$(protostar deploy ./build/erc20.json --network alpha-goerli --inputs  0x4e472d4372797374616c 0x4e4776302e322d43 18 0 0 $game $game 2>&1 )
+    crystal=$(echo ${stdout}  | grep -o -P '(?<=Contract address: ).*(?= Transaction hash:)')
+    echo 'crystal::'${crystal}
+    echo 'crystal::'${crystal} >> deploy.txt
+    echo 'Deployed ERC20 Crystal...'
+
+    stdout=$(protostar deploy ./build/erc20.json --network alpha-goerli --inputs  0x4e472d44657574657269756d 0x4e4776302e322d44 18 0 0 $game $game 2>&1 )
+    deuterium=$(echo ${stdout}  | grep -o -P '(?<=Contract address: ).*(?= Transaction hash:)')
+    echo 'deuterium::'${deuterium}
+    echo 'deuterium::'${deuterium} >> deploy.txt
+    echo 'Deployed ERC20 Deuterium...'
+
+    stdout=$(protostar deploy ./build/resources.json --network alpha-goerli --inputs $game 2>&1 )
+    resources=$(echo ${stdout}  | grep -o -P '(?<=Contract address: ).*(?= Transaction hash:)')
+    echo 'resources::'${resources}
+    echo 'resources::'${resources} >> deploy.txt
+    echo 'Deployed Resources Module...'
+
+    stdout=$(protostar deploy ./build/facilities.json --network alpha-goerli --inputs $game 2>&1 )
+    facilities=$(echo ${stdout}  | grep -o -P '(?<=Contract address: ).*(?= Transaction hash:)')
+    echo 'facilities::'${facilities}
+    echo 'facilities::'${facilities} >> deploy.txt
+    echo 'Deployed Facilities Module...'
+
+    stdout=$(protostar deploy ./build/shipyard.json --network alpha-goerli --inputs $game 2>&1 )
+    shipyard=$(echo ${stdout}  | grep -o -P '(?<=Contract address: ).*(?= Transaction hash:)')
+    echo 'shipyard::'${shipyard}
+    echo 'shipyard::'${shipyard} >> deploy.txt
+    echo 'Deployed Shipyard Module...'
+
+    stdout=$(protostar deploy ./build/research.json --network alpha-goerli --inputs $game 2>&1 )
+    research=$(echo ${stdout}  | grep -o -P '(?<=Contract address: ).*(?= Transaction hash:)')
+    echo 'research::'${research}
+    echo 'research::'${research} >> deploy.txt
+    echo 'Deployed Research Lab Module...'
+}
+
+
+main() {
+    case "$1" in
+        "build") build ;;
+        "clean") clean ;;
+        "deploy") deploy ;;
+        "reset") reset ;;
+        "devnet_deploy") devnet_deploy ;;
+    esac
+}
+
+main $@

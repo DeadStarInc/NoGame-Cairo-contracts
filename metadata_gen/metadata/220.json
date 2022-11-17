@@ -1,0 +1,23 @@
+{
+    "image": "ipfs://QmcTXgGCiMpNKeYP9aQs5hAuUPzeWumrARoc4og2wnFECp/10.png",
+    "tokenId": 220,
+    "name": "NoGame v0.2 #220",
+    "attributes": [
+        {
+            "trait_type": "size",
+            "value": 143
+        },
+        {
+            "trait_type": "temperature",
+            "value": 43
+        },
+        {
+            "trait_type": "type",
+            "value": "Ocean planet"
+        },
+        {
+            "trait_type": "position",
+            "value": 10
+        }
+    ]
+}

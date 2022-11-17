@@ -1,0 +1,23 @@
+{
+    "image": "ipfs://QmcTXgGCiMpNKeYP9aQs5hAuUPzeWumrARoc4og2wnFECp/3.png",
+    "tokenId": 363,
+    "name": "NoGame v0.2 #363",
+    "attributes": [
+        {
+            "trait_type": "size",
+            "value": 120
+        },
+        {
+            "trait_type": "temperature",
+            "value": 123
+        },
+        {
+            "trait_type": "type",
+            "value": "Earth analog"
+        },
+        {
+            "trait_type": "position",
+            "value": 3
+        }
+    ]
+}

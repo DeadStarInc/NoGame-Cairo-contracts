@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "no-game"
+version = "0.3"
+description = "A space theme MMO built on Starknet"
+authors = ["Alex Metelli <alex-metelli@gmx.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "no_game"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+cairo-lang = "^0.10.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
