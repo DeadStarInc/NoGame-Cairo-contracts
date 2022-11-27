@@ -2,6 +2,7 @@
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from main.structs import Fleet, Defence
+from shipyard.ships_performance import FleetPerformance
 
 from fleet_movements.library import (
     get_total_defences_shield_power,
@@ -11,19 +12,101 @@ from fleet_movements.library import (
     get_total_fleet_structural_integrity,
     get_total_fleet_weapon_power,
     calculate_battle_outcome,
+    calculate_attacker_damage,
+    calculate_defender_damage,
+    get_number_of_different_ships,
+    get_damaged_ships,
+    calculate_new_fleet,
 )
-
-let ATTACKER_FLEET = Fleet(10, 0, 0, 0, 0, 0, 0, 0);
-let DEFENDER_FLEET = Fleet(0, 0, 0, 10, 0, 0, 0, 0);
 
 @external
 func test_battle_round{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() {
-    let ATTACKER_FLEET = Fleet(10, 0, 0, 0, 0, 0, 0, 0);
+    let ATTACKER_FLEET = Fleet(10, 0, 0, 0, 0, 0, 10, 0);
     let DEFENDER_FLEET = Fleet(0, 0, 0, 10, 0, 0, 0, 0);
     let DEFENCES = Defence(10, 0, 0, 0, 0, 0, 0, 0);
-    let expected = (attacker_points=39290, defender_points=40160);
+    let expected = (att_points_left=601600, def_points_left=0);
     let actual = calculate_battle_outcome(ATTACKER_FLEET, DEFENDER_FLEET, DEFENCES);
     assert expected = actual;
+
+    let att_damage = calculate_attacker_damage(ATTACKER_FLEET, actual[0]);
+    assert att_damage = 40500;
+
+    let def_damage = calculate_defender_damage(DEFENDER_FLEET, DEFENCES, actual[1]);
+    assert def_damage = 40210;
+    return ();
+}
+
+@external
+func test_get_different_ships{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() {
+    let ATTACKER_FLEET = Fleet(1, 0, 0, 0, 0, 0, 0, 0);
+    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    assert actual = 1;
+
+    let ATTACKER_FLEET = Fleet(1, 1, 0, 0, 0, 0, 0, 0);
+    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    assert actual = 2;
+
+    let ATTACKER_FLEET = Fleet(1, 1, 1, 0, 0, 0, 0, 0);
+    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    assert actual = 3;
+
+    let ATTACKER_FLEET = Fleet(1, 1, 1, 1, 0, 0, 0, 0);
+    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    assert actual = 4;
+
+    let ATTACKER_FLEET = Fleet(1, 1, 1, 1, 1, 0, 0, 0);
+    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    assert actual = 5;
+
+    let ATTACKER_FLEET = Fleet(1, 1, 1, 1, 1, 1, 0, 0);
+    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    assert actual = 6;
+
+    let ATTACKER_FLEET = Fleet(1, 1, 1, 1, 1, 1, 1, 0);
+    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    assert actual = 7;
+
+    let ATTACKER_FLEET = Fleet(1, 1, 1, 1, 1, 1, 1, 1);
+    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    assert actual = 8;
+
+    return ();
+}
+
+@external
+func test_get_damaged_ships{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() {
+    let n_ships = 10;
+    let integrity = FleetPerformance.Cargo.structural_intergrity;
+
+    let damage = 2000;
+    let actual = get_damaged_ships(n_ships, integrity, damage);
+    assert actual = 0;
+
+    let damage = 4000;
+    let actual = get_damaged_ships(n_ships, integrity, damage);
+    assert actual = 1;
+
+    let damage = 6000;
+    let actual = get_damaged_ships(n_ships, integrity, damage);
+    assert actual = 1;
+
+    let damage = 8000;
+    let actual = get_damaged_ships(n_ships, integrity, damage);
+    assert actual = 2;
+
+    let damage = 4000;
+    let actual = get_damaged_ships(0, integrity, damage);
+    assert actual = 0;
+
+    return ();
+}
+
+@external
+func test_calculate_new_fleet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() {
+    let fleet = Fleet(10, 10, 0, 0, 0, 0, 0, 0);
+    let new_fleet = calculate_new_fleet(fleet, 40000);
+    assert new_fleet = Fleet(5, 9, 0, 0, 0, 0, 0, 0);
+
     return ();
 }
 
