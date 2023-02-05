@@ -3,7 +3,8 @@
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.uint256 import Uint256, uint256_check
 from starkware.starknet.common.syscalls import get_caller_address
-from defences.library import Defence
+from defences.library import Defence, DefenceQue
+from defences.IDefences import IDefences
 from facilities.IFacilities import IFacilities
 from fleet_movements.IFleetMovements import IFleetMovements
 from main.library import NoGame
@@ -197,6 +198,31 @@ func getDefenceLevels{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_chec
 }
 
 @view
+func getDefencesCost{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() -> (
+    rocket: Cost,
+    light_laser: Cost,
+    heavy_laser: Cost,
+    ion_cannon: Cost,
+    gauss: Cost,
+    plasma_turret: Cost,
+    small_dome: Cost,
+    large_Dome: Cost,
+) {
+    let (_, _, _, _, defences, _) = NoGame.modules_addresses();
+    let (costs) = IDefences.getDefenceCost(defences);
+    return (
+        costs.rocket,
+        costs.light_laser,
+        costs.heavy_laser,
+        costs.ion_cannon,
+        costs.gauss,
+        costs.plasma_turette,
+        costs.small_dome,
+        costs.large_dome,
+    );
+}
+
+@view
 func getShipsCost{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() -> (
     cargo: Cost,
     recycler: Cost,
@@ -243,6 +269,15 @@ func getShipyardQueStatus{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_
 ) -> (status: ShipyardQue) {
     let (_, _, shipyard, _, _, _) = getModulesAddresses();
     let (que_details) = IShipyard.getQueStatus(shipyard, caller);
+    return (que_details,);
+}
+
+@view
+func getDefenceQueStatus{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+    caller: felt
+) -> (status: DefenceQue) {
+    let (_, _, _, _, defences, _) = getModulesAddresses();
+    let (que_details) = IDefences.getQueStatus(defences, caller);
     return (que_details,);
 }
 

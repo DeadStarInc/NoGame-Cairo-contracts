@@ -7,7 +7,7 @@ namespace IDefences {
     func getQueStatus(caller: felt) -> (status: DefenceQue) {
     }
 
-    func getDefenceCost(caller: felt) -> (costs: DefenceCosts) {
+    func getDefenceCost() -> (costs: DefenceCosts) {
     }
 
     func rocketBuildStart(caller: felt, number_of_units: felt) -> (
