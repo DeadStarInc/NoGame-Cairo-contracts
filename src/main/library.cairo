@@ -117,6 +117,7 @@ from main.structs import (
     ShipsCosts,
     ResourcesQue,
     EspionageReport,
+    BattleReport,
 )
 
 const E18 = 10 ** 18;
@@ -1772,7 +1773,6 @@ namespace NoGame {
         return res;
     }
 
-    
     func send_attack_mission{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
         ships: Fleet, destination: Uint256
     ) -> felt {
@@ -1783,17 +1783,31 @@ namespace NoGame {
         let (planet_id) = _get_planet_id(caller);
         _check_slots_available(planet_id);
         update_fleet_levels(caller, ships);
-        let (mission_id, fuel_consumption) = IFleetMovements.sendAttackMission(fleet, caller, ships, destination);
+        let (mission_id, fuel_consumption) = IFleetMovements.sendAttackMission(
+            fleet, caller, ships, destination
+        );
         _pay_resources_erc20(caller, 0, 0, fuel_consumption);
 
         return mission_id;
     }
 
-    func launch_attack{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr(mission_id : felt) -> BattleReport {
+    func launch_attack{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+        mission_id: felt
+    ) -> BattleReport {
         let (manager) = NoGame_modules_manager.read();
         let (_, _, _, _, _, fleet) = IModulesManager.getModulesAddresses(manager);
-        
-        IFleetMovements.launch_attack(fleet, 
+        let (caller) = get_caller_address();
+        let (
+            new_attacker_fleet,
+            damaged_attacker_fleet,
+            new_defender_fleet,
+            damaged_defender_fleet,
+            new_defender_defences,
+            damaged_defence,
+        ) = IFleetMovements.launchAttack(fleet, caller, mission_id);
+
+        let report = BattleReport(damaged_attacker_fleet, damaged_defender_fleet, damaged_defence);
+        return report;
     }
 }
 //#########################################################################################

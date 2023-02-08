@@ -840,16 +840,24 @@ func sendEspionageMission{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_
 
 @external
 func readEspionageReport{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-    caller: felt, mission_id: felt
+    mission_id: felt
 ) -> (res: EspionageReport) {
-    let res = NoGame.read_espionage_report(caller, mission_id);
+    let res = NoGame.read_espionage_report(mission_id);
     return (res,);
 }
 
 @external
 func sendAttackMission{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     ships: Fleet, destination: Uint256
-) -> (mission_id : felt) {
+) -> (mission_id: felt) {
     let res = NoGame.send_attack_mission(ships, destination);
-    return(res);
+    return (res,);
+}
+
+@external
+func launchAttack{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+    mission_id: felt
+) -> (report: BattleReport) {
+    let report = NoGame.launch_attack(mission_id);
+    return (report,);
 }
