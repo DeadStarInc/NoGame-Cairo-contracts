@@ -2,7 +2,7 @@
 
 namespace FleetPerformance {
     namespace Cargo {
-        const structural_intergrity = 4000;
+        const structural_integrity = 4000;
         const shield_power = 10;
         const weapon_power = 5;
         const cargo_capacity = 5000;
@@ -11,7 +11,7 @@ namespace FleetPerformance {
     }
 
     namespace Recycler {
-        const structural_intergrity = 16000;
+        const structural_integrity = 16000;
         const shield_power = 10;
         const weapon_power = 1;
         const cargo_capacity = 20000;
@@ -20,7 +20,7 @@ namespace FleetPerformance {
     }
 
     namespace EspionageProbe {
-        const structural_intergrity = 1000;
+        const structural_integrity = 1000;
         const shield_power = 0;
         const weapon_power = 0;
         const cargo_capacity = 5;
@@ -29,7 +29,7 @@ namespace FleetPerformance {
     }
 
     namespace SolarSatellite {
-        const structural_intergrity = 2000;
+        const structural_integrity = 2000;
         const shield_power = 1;
         const weapon_power = 1;
         const cargo_capacity = 0;
@@ -38,7 +38,7 @@ namespace FleetPerformance {
     }
 
     namespace LightFighter {
-        const structural_intergrity = 4000;
+        const structural_integrity = 4000;
         const shield_power = 10;
         const weapon_power = 50;
         const cargo_capacity = 50;
@@ -47,7 +47,7 @@ namespace FleetPerformance {
     }
 
     namespace Cruiser {
-        const structural_intergrity = 27000;
+        const structural_integrity = 27000;
         const shield_power = 50;
         const weapon_power = 400;
         const cargo_capacity = 800;
@@ -56,7 +56,7 @@ namespace FleetPerformance {
     }
 
     namespace BattleShip {
-        const structural_intergrity = 60000;
+        const structural_integrity = 60000;
         const shield_power = 200;
         const weapon_power = 1000;
         const cargo_capacity = 15000;
@@ -65,7 +65,7 @@ namespace FleetPerformance {
     }
 
     namespace Deathstar {
-        const structural_intergrity = 9000000;
+        const structural_integrity = 9000000;
         const shield_power = 50000;
         const weapon_power = 200000;
         const cargo_capacity = 1000000;
