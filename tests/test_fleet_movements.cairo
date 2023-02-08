@@ -148,11 +148,36 @@ func test_espionage_mission{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, rang
     assert report_5 = expected_report;
 
     let (fuel_after) = IERC20.balanceOf(addresses.deuterium, addresses.owner);
-    let (fleet_que) = IFleetMovements.getQueStatus(addresses.fleet, addresses.owner, 1);
+    let (fleet_que) = IFleetMovements.getEspionageQueStatus(addresses.fleet, addresses.owner, 1);
     assert fleet_que.planet_id = 1;
     assert fleet_que.mission_id = 1;
     assert fleet_que.time_end = 400;
     assert fleet_que.destination = 2;
 
     return ();
+}
+
+@external
+func test_loot{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+    
+) {
+    %{
+        stop_prank_callable = start_prank(
+                ids.addresses.owner, target_contract_address=ids.addresses.game)
+        store(ids.addresses.game, "NoGame_ships_cruiser", [1], key=[1,0])
+        store(ids.addresses.game, "NoGame_ships_espionage_probe", [9], key=[2,0])
+    %}
+    NoGame.generatePlanet(addresses.game);
+    %{
+        stop_prank_callable()
+        stop_prank_callable1 = start_prank(
+                ids.addresses.p1, target_contract_address=ids.addresses.game)
+    %}
+    NoGame.generatePlanet(addresses.game);
+    %{
+        stop_prank_callable1() 
+        stop_prank_callable = start_prank(
+                ids.addresses.owner, target_contract_address=ids.addresses.game)
+    %}
+    
 }
