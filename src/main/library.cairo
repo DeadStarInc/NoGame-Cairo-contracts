@@ -253,20 +253,22 @@ namespace NoGame {
         let (weapons_tech) = NoGame_weapons_tech.read(planet_id);
 
         return (
-            TechLevels(armour_tech,
-            astrophysics,
-            combustion_drive,
-            computer_tech,
-            energy_tech,
-            espionage_tech,
-            hyperspace_drive,
-            hyperspace_tech,
-            impulse_drive,
-            ion_tech,
-            laser_tech,
-            plasma_tech,
-            shielding_tech,
-            weapons_tech),
+            TechLevels(
+                armour_tech,
+                astrophysics,
+                combustion_drive,
+                computer_tech,
+                energy_tech,
+                espionage_tech,
+                hyperspace_drive,
+                hyperspace_tech,
+                impulse_drive,
+                ion_tech,
+                laser_tech,
+                plasma_tech,
+                shielding_tech,
+                weapons_tech,
+            ),
         );
     }
 
@@ -320,7 +322,16 @@ namespace NoGame {
         let (battleship) = NoGame_ships_battleship.read(planet_id);
         let (deathstar) = NoGame_ships_deathstar.read(planet_id);
         return (
-            Fleet(cargo, recycler, espionage_probe, satellite, light_fighter, cruiser, battleship, deathstar),
+            Fleet(
+                cargo,
+                recycler,
+                espionage_probe,
+                satellite,
+                light_fighter,
+                cruiser,
+                battleship,
+                deathstar,
+            ),
         );
     }
 
@@ -338,7 +349,16 @@ namespace NoGame {
         let (large_dome) = NoGame_large_dome.read(planet_id);
 
         return (
-            Defence(rocket, light_laser, heavy_laser, ion_cannon, gauss, plasma_turette, small_dome, large_dome),
+            Defence(
+                rocket,
+                light_laser,
+                heavy_laser,
+                ion_cannon,
+                gauss,
+                plasma_turette,
+                small_dome,
+                large_dome,
+            ),
         );
     }
 
@@ -1729,6 +1749,7 @@ namespace NoGame {
         let (manager) = NoGame_modules_manager.read();
         let (_, _, _, _, _, fleet) = IModulesManager.getModulesAddresses(manager);
         _check_slots_available(planet_id);
+        update_fleet_levels(caller, ships);
         let (mission_id, fuel_consumption) = IFleetMovements.sendSpyMission(
             fleet, caller, ships, destination
         );
@@ -1738,21 +1759,75 @@ namespace NoGame {
     }
 
     func read_espionage_report{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-        caller: felt, mission_id: felt
+        mission_id: felt
     ) -> EspionageReport {
         alloc_locals;
         let (manager) = NoGame_modules_manager.read();
         let (_, _, _, _, _, fleet) = IModulesManager.getModulesAddresses(manager);
+        let (caller) = get_caller_address();
         let (res) = IFleetMovements.readEspionageReport(fleet, caller, mission_id);
         let (planet_id) = _get_planet_id(caller);
         let (active_missions) = NoGame_active_missions.read(planet_id);
         NoGame_active_missions.write(planet_id, active_missions - 1);
         return res;
     }
+
+    
+    func send_attack_mission{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+        ships: Fleet, destination: Uint256
+    ) -> felt {
+        alloc_locals;
+        let (manager) = NoGame_modules_manager.read();
+        let (_, _, _, _, _, fleet) = IModulesManager.getModulesAddresses(manager);
+        let (caller) = get_caller_address();
+        let (planet_id) = _get_planet_id(caller);
+        _check_slots_available(planet_id);
+        update_fleet_levels(caller, ships);
+        let (mission_id, fuel_consumption) = IFleetMovements.sendAttackMission(fleet, caller, ships, destination);
+        _pay_resources_erc20(caller, 0, 0, fuel_consumption);
+
+        return mission_id;
+    }
+
+    func launch_attack{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr(mission_id : felt) -> BattleReport {
+        let (manager) = NoGame_modules_manager.read();
+        let (_, _, _, _, _, fleet) = IModulesManager.getModulesAddresses(manager);
+        
+        IFleetMovements.launch_attack(fleet, 
+    }
 }
 //#########################################################################################
 //                                      PRIVATE FUNCTIONS                                 #
 //#########################################################################################
+func update_fleet_levels{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+    caller: felt, fleet: Fleet
+) {
+    let (planet_id) = _get_planet_id(caller);
+    NoGame_ships_cargo.write(planet_id, fleet.cargo);
+    NoGame_ships_recycler.write(planet_id, fleet.recycler);
+    NoGame_ships_espionage_probe.write(planet_id, fleet.espionage_probe);
+    NoGame_ships_solar_satellite.write(planet_id, fleet.solar_satellite);
+    NoGame_ships_cruiser.write(planet_id, fleet.cruiser);
+    NoGame_ships_battleship.write(planet_id, fleet.battle_ship);
+    NoGame_ships_deathstar.write(planet_id, fleet.death_star);
+    return ();
+}
+
+func update_defence_levels{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+    caller: felt, defence: Defence
+) {
+    let (planet_id) = _get_planet_id(caller);
+    NoGame_rocket.write(planet_id, defence.rocket);
+    NoGame_ligth_laser.write(planet_id, defence.light_laser);
+    NoGame_heavy_laser.write(planet_id, defence.heavy_laser);
+    NoGame_ion_cannon.write(planet_id, defence.ion_cannon);
+    NoGame_gauss.write(planet_id, defence.gauss);
+    NoGame_plasma_turret.write(planet_id, defence.plasma_turret);
+    NoGame_small_dome.write(planet_id, defence.small_dome);
+    NoGame_large_dome.write(planet_id, defence.large_dome);
+    return ();
+}
+
 func _get_planet_id{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     caller: felt
 ) -> (planet_id: Uint256) {
