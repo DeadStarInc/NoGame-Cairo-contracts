@@ -14,7 +14,7 @@ from fleet_movements.library import (
     calculate_battle_outcome,
     calculate_attacker_damage,
     calculate_defender_damage,
-    get_number_of_different_ships,
+    get_number_of_ships,
     get_damaged_ships,
     calculate_new_fleet,
 )
@@ -39,35 +39,35 @@ func test_battle_round{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_che
 @external
 func test_get_different_ships{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() {
     let ATTACKER_FLEET = Fleet(1, 0, 0, 0, 0, 0, 0, 0);
-    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    let actual = get_number_of_ships(ATTACKER_FLEET);
     assert actual = 1;
 
     let ATTACKER_FLEET = Fleet(1, 1, 0, 0, 0, 0, 0, 0);
-    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    let actual = get_number_of_ships(ATTACKER_FLEET);
     assert actual = 2;
 
     let ATTACKER_FLEET = Fleet(1, 1, 1, 0, 0, 0, 0, 0);
-    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    let actual = get_number_of_ships(ATTACKER_FLEET);
     assert actual = 3;
 
     let ATTACKER_FLEET = Fleet(1, 1, 1, 1, 0, 0, 0, 0);
-    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    let actual = get_number_of_ships(ATTACKER_FLEET);
     assert actual = 4;
 
     let ATTACKER_FLEET = Fleet(1, 1, 1, 1, 1, 0, 0, 0);
-    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    let actual = get_number_of_ships(ATTACKER_FLEET);
     assert actual = 5;
 
     let ATTACKER_FLEET = Fleet(1, 1, 1, 1, 1, 1, 0, 0);
-    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    let actual = get_number_of_ships(ATTACKER_FLEET);
     assert actual = 6;
 
     let ATTACKER_FLEET = Fleet(1, 1, 1, 1, 1, 1, 1, 0);
-    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    let actual = get_number_of_ships(ATTACKER_FLEET);
     assert actual = 7;
 
     let ATTACKER_FLEET = Fleet(1, 1, 1, 1, 1, 1, 1, 1);
-    let actual = get_number_of_different_ships(ATTACKER_FLEET);
+    let actual = get_number_of_ships(ATTACKER_FLEET);
     assert actual = 8;
 
     return ();
@@ -76,26 +76,27 @@ func test_get_different_ships{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, ra
 @external
 func test_get_damaged_ships{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() {
     let n_ships = 10;
-    let integrity = FleetPerformance.Cargo.structural_intergrity;
+    let integrity = FleetPerformance.Cargo.structural_integrity;
+    let shield = FleetPerformance.Cargo.shield_power;
 
     let damage = 2000;
-    let actual = get_damaged_ships(n_ships, integrity, damage);
+    let actual = get_damaged_ships(n_ships, integrity, shield, damage);
     assert actual = 0;
 
     let damage = 4000;
-    let actual = get_damaged_ships(n_ships, integrity, damage);
-    assert actual = 1;
+    let actual = get_damaged_ships(n_ships, integrity, shield, damage);
+    assert actual = 0;
 
     let damage = 6000;
-    let actual = get_damaged_ships(n_ships, integrity, damage);
+    let actual = get_damaged_ships(n_ships, integrity, shield, damage);
     assert actual = 1;
 
     let damage = 8000;
-    let actual = get_damaged_ships(n_ships, integrity, damage);
-    assert actual = 2;
+    let actual = get_damaged_ships(n_ships, integrity, shield, damage);
+    assert actual = 1;
 
-    let damage = 4000;
-    let actual = get_damaged_ships(0, integrity, damage);
+    let damage = 40000;
+    let actual = get_damaged_ships(0, integrity, shield, damage);
     assert actual = 0;
 
     return ();
@@ -104,8 +105,9 @@ func test_get_damaged_ships{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, rang
 @external
 func test_calculate_new_fleet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() {
     let fleet = Fleet(10, 10, 0, 0, 0, 0, 0, 0);
-    let new_fleet = calculate_new_fleet(fleet, 40000);
-    assert new_fleet = Fleet(5, 9, 0, 0, 0, 0, 0, 0);
+    let damaged = Fleet(2, 3, 0, 0, 0, 0, 0, 0);
+    let new_fleet = calculate_new_fleet(fleet, damaged);
+    assert new_fleet = Fleet(8, 7, 0, 0, 0, 0, 0, 0);
 
     return ();
 }
