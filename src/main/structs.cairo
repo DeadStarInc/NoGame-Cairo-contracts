@@ -141,17 +141,17 @@ struct PlanetResources {
 }
 
 struct AttackQue {
-    planet_id: felt,
+    planet_id: Uint256,
     mission_id: felt,
     time_end: felt,
-    destination: felt,
+    destination: Uint256,
 }
 
 struct EspionageQue {
-    planet_id: felt,
+    planet_id: Uint256,
     mission_id: felt,
     time_end: felt,
-    destination: felt,
+    destination: Uint256,
 }
 
 struct EspionageReport {
@@ -160,4 +160,9 @@ struct EspionageReport {
     fleet: Fleet,
     facilities: FacilitiesBuildings,
     research: TechLevels,
+}
+
+struct BattleReport {
+    ships_lost : Fleet,
+    defences_lost : Defence
 }
