@@ -111,7 +111,14 @@ namespace FleetMovements {
 
     func launch_attack{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
         caller: felt, mission_id: felt
-    ) -> (new_attacker_fleet: Fleet, new_defender_fleet: Fleet, new_defender_defences: Defence) {
+    ) -> (
+        new_attacker_fleet: Fleet,
+        attacker_lost_fleet: Fleet,
+        new_defender_fleet: Fleet,
+        defender_lost_fleet: Fleet,
+        new_defender_defences: Defence,
+        defender_lost_defences: Defence,
+    ) {
         let time_now = get_block_timestamp();
         let que_details = get_attack_que_status(caller, mission_id);
         with_attr error_message("Ships are still travelling to destination") {
@@ -125,14 +132,25 @@ namespace FleetMovements {
         let (attacker_damage, defender_damage) = calculate_battle_outcome(
             attacker_fleet, defender_fleet, defender_defences
         );
-        let new_attacker_fleet = calculate_new_fleet(attacker_fleet, attacker_damage);
+
+        let damaged_attacker_fleet = calculate_lost_fleet(attacker_fleet, attacker_damage);
+        let new_attacker_fleet = calculate_new_fleet(attacker_fleet, damaged_attacker_fleet);
 
         let (defender_damage, _) = unsigned_div_rem(dead_damaged, 2);
-        let new_defender_fleet = calculate_new_fleet(defender_fleet, defender_damage);
+        let damaged_defender_fleet = calculate_lost_fleet(defender_fleet, defender_damage);
+        let new_defender_fleet = calculate_new_fleet(defender_fleet, damaged_defender_fleet);
+
         let damaged_defences = calculate_lost_defences(defender_defences, defender_damage);
         let new_defender_defences = calculate_new_defences(defender_defences, damaged_defences);
         reduce_active_missions(planet_id);
-        return (new_attacker_fleet, new_defender_fleet, new_defender_defences);
+        return (
+            new_attacker_fleet,
+            damaged_attacker_fleet,
+            new_defender_fleet,
+            damaged_defender_fleet,
+            new_defender_defences,
+            damage_per_defence,
+        );
     }
 
     func read_espionage_report{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
