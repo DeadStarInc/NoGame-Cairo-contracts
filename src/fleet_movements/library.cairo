@@ -890,6 +890,20 @@ func calculate_new_defences{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, rang
     return (new_defences);
 }
 
+func calculate_new_fleet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+    ships: Fleet, damaged: Fleet
+) -> Fleet {
+    let cargo = safe_ships_sub(fleet.cargo, cargo_damaged);
+    let recycler = safe_ships_sub(fleet.recycler, recycler_damaged);
+    let probe = safe_ships_sub(fleet.espionage_probe, probe_damaged);
+    let satellite = safe_ships_sub(fleet.solar_satellite, satellite_damaged);
+    let fighter = safe_ships_sub(fleet.light_fighter, fighter_damaged);
+    let cruiser = safe_ships_sub(fleet.cruiser, cruiser_damaged);
+    let bs = safe_ships_sub(fleet.battle_ship, bs_damaged);
+    let dead = safe_ships_sub(fleet.death_star, dead_damaged);
+    return Fleet(cargo, recycler, probe, satellite, fighter, cruiser, bs, dead);
+}
+
 func calculate_lost_fleet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     fleet: Fleet, damage: felt
 ) -> Fleet {
@@ -900,49 +914,50 @@ func calculate_lost_fleet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_
     let cargo_damaged = get_damaged_ships(
         fleet.cargo, FleetPerformance.Cargo.structural_intergrity, damage_per_ship
     );
-    let cargo = safe_ships_sub(fleet.cargo, cargo_damaged);
 
     let recycler_damaged = get_damaged_ships(
         fleet.recycler, FleetPerformance.Recycler.structural_intergrity, damage_per_ship
     );
-    let recycler = safe_ships_sub(fleet.recycler, recycler_damaged);
 
     let probe_damaged = get_damaged_ships(
         fleet.espionage_probe,
         FleetPerformance.EspionageProbe.structural_intergrity,
         damage_per_ship,
     );
-    let probe = safe_ships_sub(fleet.espionage_probe, probe_damaged);
 
     let satellite_damaged = get_damaged_ships(
         fleet.solar_satellite,
         FleetPerformance.SolarSatellite.structural_intergrity,
         damage_per_ship,
     );
-    let satellite = safe_ships_sub(fleet.solar_satellite, satellite_damaged);
 
     let fighter_damaged = get_damaged_ships(
         fleet.light_fighter, FleetPerformance.LightFighter.structural_intergrity, damage_per_ship
     );
-    let fighter = safe_ships_sub(fleet.light_fighter, fighter_damaged);
 
     let cruiser_damaged = get_damaged_ships(
         fleet.cruiser, FleetPerformance.Cruiser.structural_intergrity, damage_per_ship
     );
-    let cruiser = safe_ships_sub(fleet.cruiser, cruiser_damaged);
 
     let bs_damaged = get_damaged_ships(
         fleet.battle_ship, FleetPerformance.BattleShip.structural_intergrity, damage_per_ship
     );
-    let bs = safe_ships_sub(fleet.battle_ship, bs_damaged);
 
     let dead_damaged = get_damaged_ships(
         fleet.death_star, FleetPerformance.Deathstar.structural_intergrity, damage_per_ship
     );
-    let dead = safe_ships_sub(fleet.death_star, dead_damaged);
 
-    let new_fleet = Fleet(cargo, recycler, probe, satellite, fighter, cruiser, bs, dead);
-    return new_fleet;
+    let damaged_fleet = Fleet(
+        cargo_damaged,
+        recycler_damaged,
+        probe_damaged,
+        satellite_damaged,
+        fighter_damaged,
+        cruiser_damaged,
+        bs_damaged,
+        dead_damaged,
+    );
+    return damaged_fleet;
 }
 
 func get_numeber_of_defences{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
