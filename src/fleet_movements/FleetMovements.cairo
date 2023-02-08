@@ -3,7 +3,7 @@
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.uint256 import Uint256
 from fleet_movements.library import FleetMovements, EspionageReport
-from main.structs import Fleet, EspionageQue, AttackQue
+from main.structs import Fleet, EspionageQue, AttackQue, Defence
 
 @constructor
 func constructor{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
@@ -50,7 +50,38 @@ func readEspionageReport{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_c
 @external
 func sendAttackMission{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     caller: felt, ships: Fleet, destination: Uint256
-) -> (mission_id : felt, fuel_consumption : felt) {
-    let (mission_id, fuel_consumption) = FleetMovements.send_attack_mission(caller, ships, destination);
-    return(mission_id, fuel_consumption);
+) -> (mission_id: felt, fuel_consumption: felt) {
+    let (mission_id, fuel_consumption) = FleetMovements.send_attack_mission(
+        caller, ships, destination
+    );
+    return (mission_id, fuel_consumption);
+}
+
+@external
+func launchAttack{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+    caller: felt, mission_id: felt
+) -> (
+    new_attacker_fleet: Fleet,
+    attacker_lost_fleet: Fleet,
+    new_defender_fleet: Fleet,
+    defender_lost_fleet: Fleet,
+    new_defender_defences: Defence,
+    defender_lost_defences: Defence,
+) {
+    let (
+        new_attacker_fleet,
+        attacker_lost_fleet,
+        new_defender_fleet,
+        defender_lost_fleet,
+        new_defender_defences,
+        defender_lost_defences,
+    ) = FleetMovements.launch_attack(caller, mission_id);
+    return (
+        new_attacker_fleet,
+        attacker_lost_fleet,
+        new_defender_fleet,
+        defender_lost_fleet,
+        new_defender_defences,
+        defender_lost_defences,
+    );
 }
