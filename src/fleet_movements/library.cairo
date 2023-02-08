@@ -886,7 +886,7 @@ func calculate_lost_defences{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, ran
         );
         return damaged_defences;
     } else {
-        let no_defences = Defence(0,0,0,0,0,0,0,0);
+        let no_defences = Defence(0, 0, 0, 0, 0, 0, 0, 0);
         return no_defences;
     }
 }
@@ -929,7 +929,7 @@ func calculate_new_fleet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_c
     let cruiser = safe_ships_sub(fleet.cruiser, damaged.cruiser);
     let bs = safe_ships_sub(fleet.battle_ship, damaged.battle_ship);
     let dead = safe_ships_sub(fleet.death_star, damaged.death_star);
-    let new_fleet =Fleet(cargo, recycler, probe, satellite, fighter, cruiser, bs, dead);
+    let new_fleet = Fleet(cargo, recycler, probe, satellite, fighter, cruiser, bs, dead);
     return new_fleet;
 }
 
@@ -941,35 +941,59 @@ func calculate_lost_fleet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_
     let (damage_per_ship, _) = unsigned_div_rem(damage, n_ships);
 
     let cargo_damaged = get_damaged_ships(
-        fleet.cargo, FleetPerformance.Cargo.structural_integrity, FleetPerformance.Cargo.shield_power,  damage_per_ship
+        fleet.cargo,
+        FleetPerformance.Cargo.structural_integrity,
+        FleetPerformance.Cargo.shield_power,
+        damage_per_ship,
     );
 
     let recycler_damaged = get_damaged_ships(
-        fleet.recycler, FleetPerformance.Recycler.structural_integrity,FleetPerformance.Recycler.shield_power, damage_per_ship
+        fleet.recycler,
+        FleetPerformance.Recycler.structural_integrity,
+        FleetPerformance.Recycler.shield_power,
+        damage_per_ship,
     );
 
     let probe_damaged = get_damaged_ships(
-        fleet.espionage_probe, FleetPerformance.EspionageProbe.structural_integrity,FleetPerformance.EspionageProbe.shield_power, damage_per_ship
+        fleet.espionage_probe,
+        FleetPerformance.EspionageProbe.structural_integrity,
+        FleetPerformance.EspionageProbe.shield_power,
+        damage_per_ship,
     );
 
     let satellite_damaged = get_damaged_ships(
-        fleet.solar_satellite, FleetPerformance.SolarSatellite.structural_integrity,FleetPerformance.SolarSatellite.shield_power, damage_per_ship
+        fleet.solar_satellite,
+        FleetPerformance.SolarSatellite.structural_integrity,
+        FleetPerformance.SolarSatellite.shield_power,
+        damage_per_ship,
     );
 
     let fighter_damaged = get_damaged_ships(
-        fleet.light_fighter, FleetPerformance.LightFighter.structural_integrity,FleetPerformance.LightFighter.shield_power, damage_per_ship
+        fleet.light_fighter,
+        FleetPerformance.LightFighter.structural_integrity,
+        FleetPerformance.LightFighter.shield_power,
+        damage_per_ship,
     );
 
     let cruiser_damaged = get_damaged_ships(
-        fleet.cruiser, FleetPerformance.Cruiser.structural_integrity,FleetPerformance.Cruiser.shield_power, damage_per_ship
+        fleet.cruiser,
+        FleetPerformance.Cruiser.structural_integrity,
+        FleetPerformance.Cruiser.shield_power,
+        damage_per_ship,
     );
 
     let bs_damaged = get_damaged_ships(
-        fleet.battle_ship, FleetPerformance.BattleShip.structural_integrity,FleetPerformance.BattleShip.shield_power, damage_per_ship
+        fleet.battle_ship,
+        FleetPerformance.BattleShip.structural_integrity,
+        FleetPerformance.BattleShip.shield_power,
+        damage_per_ship,
     );
 
     let dead_damaged = get_damaged_ships(
-        fleet.death_star, FleetPerformance.Deathstar.structural_integrity,FleetPerformance.Deathstar.shield_power, damage_per_ship
+        fleet.death_star,
+        FleetPerformance.Deathstar.structural_integrity,
+        FleetPerformance.Deathstar.shield_power,
+        damage_per_ship,
     );
 
     let damaged_fleet = Fleet(
