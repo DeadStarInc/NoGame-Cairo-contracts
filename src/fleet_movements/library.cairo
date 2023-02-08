@@ -13,7 +13,7 @@ from starkware.cairo.common.math import (
 from starkware.cairo.common.math_cmp import is_not_zero, is_nn, is_le_felt
 from starkware.cairo.common.uint256 import Uint256
 from starkware.starknet.common.syscalls import get_block_timestamp
-from shipyard.ships_performance import FleetPerformance, DefencesPerformance
+from shipyard.ships_performance import FleetPerformance
 from defences.defences_performance import DefencesPerformance
 from main.INoGame import INoGame
 from main.structs import (
@@ -119,7 +119,8 @@ namespace FleetMovements {
         new_defender_defences: Defence,
         defender_lost_defences: Defence,
     ) {
-        let time_now = get_block_timestamp();
+        alloc_locals;
+        let (time_now) = get_block_timestamp();
         let que_details = get_attack_que_status(caller, mission_id);
         with_attr error_message("Ships are still travelling to destination") {
             assert_le_felt(que_details.time_end, time_now);
@@ -136,12 +137,13 @@ namespace FleetMovements {
         let damaged_attacker_fleet = calculate_lost_fleet(attacker_fleet, attacker_damage);
         let new_attacker_fleet = calculate_new_fleet(attacker_fleet, damaged_attacker_fleet);
 
-        let (defender_damage, _) = unsigned_div_rem(dead_damaged, 2);
+        let (defender_damage, _) = unsigned_div_rem(defender_damage, 2);
         let damaged_defender_fleet = calculate_lost_fleet(defender_fleet, defender_damage);
         let new_defender_fleet = calculate_new_fleet(defender_fleet, damaged_defender_fleet);
 
         let damaged_defences = calculate_lost_defences(defender_defences, defender_damage);
         let new_defender_defences = calculate_new_defences(defender_defences, damaged_defences);
+        let planet_id = get_planet_id(caller);
         reduce_active_missions(planet_id);
         return (
             new_attacker_fleet,
@@ -149,7 +151,7 @@ namespace FleetMovements {
             new_defender_fleet,
             damaged_defender_fleet,
             new_defender_defences,
-            damage_per_defence,
+            damaged_defences,
         );
     }
 
@@ -160,7 +162,7 @@ namespace FleetMovements {
         let planet_id = get_planet_id(caller);
         let (que_details) = FleetMovements_espionage_que_details.read(planet_id, mission_id);
         check_espionage_timelock_expired(que_details);
-        let destination = Uint256(que_details.destination, 0);
+        let destination = que_details.destination;
         let espionage_difference = get_espionage_power_difference(planet_id, destination);
         reduce_active_missions(planet_id);
 
@@ -442,10 +444,10 @@ func set_attack_que{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_
     let time_end = time_now + travel_time;
     let (active_missions) = FleetMovements_active_missions.read(starting_planet);
     let new_que_point = AttackQue(
-        planet_id=starting_planet.low,
+        planet_id=starting_planet,
         mission_id=active_missions + 1,
         time_end=time_end,
-        destination=destination.low,
+        destination=destination,
     );
     let sender_addr = get_owners_from_planet_id(starting_planet);
     FleetMovements_attack_que_details.write(starting_planet, active_missions + 1, new_que_point);
@@ -645,25 +647,25 @@ func get_total_fleet_structural_integrity{
 }(fleet: Fleet) -> felt {
     // cargos
     let cargo = fleet.cargo;
-    let cargo_struct = cargo * FleetPerformance.Cargo.structural_intergrity;
+    let cargo_struct = cargo * FleetPerformance.Cargo.structural_integrity;
     // recyclers
     let recycler = fleet.recycler;
-    let recycler_struct = recycler * FleetPerformance.Recycler.structural_intergrity;
+    let recycler_struct = recycler * FleetPerformance.Recycler.structural_integrity;
     // espionage probes
     let probes = fleet.espionage_probe;
-    let probe_struct = probes * FleetPerformance.EspionageProbe.structural_intergrity;
+    let probe_struct = probes * FleetPerformance.EspionageProbe.structural_integrity;
     // solar satellites
     let satellites = fleet.solar_satellite;
-    let satellites_struct = satellites * FleetPerformance.SolarSatellite.structural_intergrity;
+    let satellites_struct = satellites * FleetPerformance.SolarSatellite.structural_integrity;
     // light fighter
     let fighters = fleet.light_fighter;
-    let fighter_struct = fighters * FleetPerformance.LightFighter.structural_intergrity;
+    let fighter_struct = fighters * FleetPerformance.LightFighter.structural_integrity;
     // Cruiser
     let cruiser = fleet.cruiser;
-    let cruiser_struct = cruiser * FleetPerformance.Cruiser.structural_intergrity;
+    let cruiser_struct = cruiser * FleetPerformance.Cruiser.structural_integrity;
     // battleships
     let battleships = fleet.battle_ship;
-    let bs_struct = battleships * FleetPerformance.BattleShip.structural_intergrity;
+    let bs_struct = battleships * FleetPerformance.BattleShip.structural_integrity;
     return cargo_struct + recycler_struct + probe_struct + satellites_struct + fighter_struct +
         cruiser_struct + bs_struct;
 }
@@ -734,28 +736,28 @@ func get_total_defences_structural_power{
 }(defences: Defence) -> felt {
     // rocket launcher
     let rocket = defences.rocket;
-    let rocket_struct = DefencesPerformance.Rocket.structural_intergrity * rocket;
+    let rocket_struct = DefencesPerformance.Rocket.structural_integrity * rocket;
     // light laser
     let l_laser = defences.light_laser;
-    let l_laser_struct = DefencesPerformance.LightLaser.structural_intergrity * l_laser;
+    let l_laser_struct = DefencesPerformance.LightLaser.structural_integrity * l_laser;
     // heavy laser
     let h_laser = defences.heavy_laser;
-    let h_laser_struct = DefencesPerformance.HeavyLaser.structural_intergrity * h_laser;
+    let h_laser_struct = DefencesPerformance.HeavyLaser.structural_integrity * h_laser;
     // ion cannon
     let ion = defences.ion_cannon;
-    let ion_struct = DefencesPerformance.IonCannon.structural_intergrity * ion;
+    let ion_struct = DefencesPerformance.IonCannon.structural_integrity * ion;
     // gauss cannon
     let gauss = defences.gauss;
-    let gauss_struct = DefencesPerformance.GaussCannon.structural_intergrity * gauss;
+    let gauss_struct = DefencesPerformance.GaussCannon.structural_integrity * gauss;
     // plasma turret
     let plasma = defences.plasma_turret;
-    let plasma_struct = DefencesPerformance.PlasmaTurret.structural_intergrity * plasma;
+    let plasma_struct = DefencesPerformance.PlasmaTurret.structural_integrity * plasma;
     // small dome
     let s_dome = defences.small_dome;
-    let small_dome = DefencesPerformance.SmallDome.structural_intergrity * s_dome;
+    let small_dome = DefencesPerformance.SmallDome.structural_integrity * s_dome;
     // large dome
     let l_dome = defences.large_dome;
-    let large_dome = DefencesPerformance.LargeDome.structural_intergrity * l_dome;
+    let large_dome = DefencesPerformance.LargeDome.structural_integrity * l_dome;
 
     let res = rocket_struct + l_laser_struct + h_laser_struct + ion_struct + gauss_struct +
         plasma_struct + small_dome + large_dome;
@@ -809,83 +811,90 @@ func get_damaged_ships{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_che
 
 func calculate_lost_defences{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     defences: Defence, damage: felt
-) -> (lost_units: Defence) {
+) -> Defence {
     alloc_locals;
     let n_defence = get_numeber_of_defences(defences);
-    let (damage_per_defence, _) = unsigned_div_rem(damage, n_defence);
+    let cond = is_not_zero(n_defence);
+    if (cond == TRUE) {
+        let (damage_per_defence, _) = unsigned_div_rem(damage, n_defence);
 
-    let rocket_damage = get_damaged_ships(
-        defences.rocket,
-        DefencesPerformance.Rocket.struct_integrity,
-        DefencesPerformance.Rocket.shield_power,
-        damage_per_defence,
-    );
+        let rocket_damage = get_damaged_ships(
+            defences.rocket,
+            DefencesPerformance.Rocket.structural_integrity,
+            DefencesPerformance.Rocket.shield_power,
+            damage_per_defence,
+        );
 
-    let light_laser_damage = get_damaged_ships(
-        defences.light_laser,
-        DefencesPerformance.LightLaser.struct_integrity,
-        DefencesPerformance.LightLaser.shield_power,
-        damage_per_defence,
-    );
+        let light_laser_damage = get_damaged_ships(
+            defences.light_laser,
+            DefencesPerformance.LightLaser.structural_integrity,
+            DefencesPerformance.LightLaser.shield_power,
+            damage_per_defence,
+        );
 
-    let heavy_laser_damage = get_damaged_ships(
-        defences.heavy_laser,
-        DefencesPerformance.HeavyLaser.struct_integrity,
-        DefencesPerformance.HeavyLaser.shield_power,
-        damage_per_defence,
-    );
+        let heavy_laser_damage = get_damaged_ships(
+            defences.heavy_laser,
+            DefencesPerformance.HeavyLaser.structural_integrity,
+            DefencesPerformance.HeavyLaser.shield_power,
+            damage_per_defence,
+        );
 
-    let ion_cannon_damage = get_damaged_ships(
-        defences.ion_cannon,
-        DefencesPerformance.IonCannon.struct_integrity,
-        DefencesPerformance.IonCannon.shield_power,
-        damage_per_defence,
-    );
+        let ion_cannon_damage = get_damaged_ships(
+            defences.ion_cannon,
+            DefencesPerformance.IonCannon.structural_integrity,
+            DefencesPerformance.IonCannon.shield_power,
+            damage_per_defence,
+        );
 
-    let gauss_damage = get_damaged_ships(
-        defences.gauss,
-        DefencesPerformance.GaussCannon.struct_integrity,
-        DefencesPerformance.GaussCannon.shield_power,
-        damage_per_defence,
-    );
+        let gauss_damage = get_damaged_ships(
+            defences.gauss,
+            DefencesPerformance.GaussCannon.structural_integrity,
+            DefencesPerformance.GaussCannon.shield_power,
+            damage_per_defence,
+        );
 
-    let plasma_damage = get_damaged_ships(
-        defences.plasma_turret,
-        DefencesPerformance.PlasmaTurret.struct_integrity,
-        DefencesPerformance.PlasmaTurret.shield_power,
-        damage_per_defence,
-    );
+        let plasma_damage = get_damaged_ships(
+            defences.plasma_turret,
+            DefencesPerformance.PlasmaTurret.structural_integrity,
+            DefencesPerformance.PlasmaTurret.shield_power,
+            damage_per_defence,
+        );
 
-    let small_dome_damage = get_damaged_ships(
-        defences.small_dome,
-        DefencesPerformance.SmallDome.struct_integrity,
-        DefencesPerformance.SmallDome.shield_power,
-        damage_per_defence,
-    );
+        let small_dome_damage = get_damaged_ships(
+            defences.small_dome,
+            DefencesPerformance.SmallDome.structural_integrity,
+            DefencesPerformance.SmallDome.shield_power,
+            damage_per_defence,
+        );
 
-    let large_dome_damage = get_damaged_ships(
-        defences.large_dome,
-        DefencesPerformance.LargeDome.struct_integrity,
-        DefencesPerformance.LargeDome.shield_power,
-        damage_per_defence,
-    );
+        let large_dome_damage = get_damaged_ships(
+            defences.large_dome,
+            DefencesPerformance.LargeDome.structural_integrity,
+            DefencesPerformance.LargeDome.shield_power,
+            damage_per_defence,
+        );
 
-    let damaged_defences = Defence(
-        new_rocket,
-        new_light_laser,
-        new_heavy_laser,
-        new_ion_cannon,
-        new_gauss,
-        new_plasma,
-        new_small_dome,
-        new_large_dome,
-    );
-    return (damaged_defences);
+        let damaged_defences = Defence(
+            rocket_damage,
+            light_laser_damage,
+            heavy_laser_damage,
+            ion_cannon_damage,
+            gauss_damage,
+            plasma_damage,
+            small_dome_damage,
+            large_dome_damage,
+        );
+        return damaged_defences;
+    } else {
+        let no_defences = Defence(0,0,0,0,0,0,0,0);
+        return no_defences;
+    }
 }
 
 func calculate_new_defences{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-    defences: Defence, damaged: Defence
-) -> (new_defences: Defence) {
+    defence: Defence, damaged: Defence
+) -> Defence {
+    alloc_locals;
     let new_rocket = safe_ships_sub(defence.rocket, damaged.rocket);
     let new_light_laser = safe_ships_sub(defence.light_laser, damaged.light_laser);
     let new_heavy_laser = safe_ships_sub(defence.heavy_laser, damaged.heavy_laser);
@@ -893,7 +902,7 @@ func calculate_new_defences{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, rang
     let new_gauss = safe_ships_sub(defence.gauss, damaged.gauss);
     let new_plasma = safe_ships_sub(defence.plasma_turret, damaged.plasma_turret);
     let new_small_dome = safe_ships_sub(defence.small_dome, damaged.small_dome);
-    let new_large_dome = safe_ships_sub(defence.large_dome, damage.large_dome);
+    let new_large_dome = safe_ships_sub(defence.large_dome, damaged.large_dome);
 
     let new_defences = Defence(
         new_rocket,
@@ -905,21 +914,23 @@ func calculate_new_defences{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, rang
         new_small_dome,
         new_large_dome,
     );
-    return (new_defences);
+    return new_defences;
 }
 
 func calculate_new_fleet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-    ships: Fleet, damaged: Fleet
+    fleet: Fleet, damaged: Fleet
 ) -> Fleet {
-    let cargo = safe_ships_sub(fleet.cargo, cargo_damaged);
-    let recycler = safe_ships_sub(fleet.recycler, recycler_damaged);
-    let probe = safe_ships_sub(fleet.espionage_probe, probe_damaged);
-    let satellite = safe_ships_sub(fleet.solar_satellite, satellite_damaged);
-    let fighter = safe_ships_sub(fleet.light_fighter, fighter_damaged);
-    let cruiser = safe_ships_sub(fleet.cruiser, cruiser_damaged);
-    let bs = safe_ships_sub(fleet.battle_ship, bs_damaged);
-    let dead = safe_ships_sub(fleet.death_star, dead_damaged);
-    return Fleet(cargo, recycler, probe, satellite, fighter, cruiser, bs, dead);
+    alloc_locals;
+    let cargo = safe_ships_sub(fleet.cargo, damaged.cargo);
+    let recycler = safe_ships_sub(fleet.recycler, damaged.recycler);
+    let probe = safe_ships_sub(fleet.espionage_probe, damaged.espionage_probe);
+    let satellite = safe_ships_sub(fleet.solar_satellite, damaged.solar_satellite);
+    let fighter = safe_ships_sub(fleet.light_fighter, damaged.light_fighter);
+    let cruiser = safe_ships_sub(fleet.cruiser, damaged.cruiser);
+    let bs = safe_ships_sub(fleet.battle_ship, damaged.battle_ship);
+    let dead = safe_ships_sub(fleet.death_star, damaged.death_star);
+    let new_fleet =Fleet(cargo, recycler, probe, satellite, fighter, cruiser, bs, dead);
+    return new_fleet;
 }
 
 func calculate_lost_fleet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
@@ -930,39 +941,35 @@ func calculate_lost_fleet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_
     let (damage_per_ship, _) = unsigned_div_rem(damage, n_ships);
 
     let cargo_damaged = get_damaged_ships(
-        fleet.cargo, FleetPerformance.Cargo.structural_intergrity, damage_per_ship
+        fleet.cargo, FleetPerformance.Cargo.structural_integrity, FleetPerformance.Cargo.shield_power,  damage_per_ship
     );
 
     let recycler_damaged = get_damaged_ships(
-        fleet.recycler, FleetPerformance.Recycler.structural_intergrity, damage_per_ship
+        fleet.recycler, FleetPerformance.Recycler.structural_integrity,FleetPerformance.Recycler.shield_power, damage_per_ship
     );
 
     let probe_damaged = get_damaged_ships(
-        fleet.espionage_probe,
-        FleetPerformance.EspionageProbe.structural_intergrity,
-        damage_per_ship,
+        fleet.espionage_probe, FleetPerformance.EspionageProbe.structural_integrity,FleetPerformance.EspionageProbe.shield_power, damage_per_ship
     );
 
     let satellite_damaged = get_damaged_ships(
-        fleet.solar_satellite,
-        FleetPerformance.SolarSatellite.structural_intergrity,
-        damage_per_ship,
+        fleet.solar_satellite, FleetPerformance.SolarSatellite.structural_integrity,FleetPerformance.SolarSatellite.shield_power, damage_per_ship
     );
 
     let fighter_damaged = get_damaged_ships(
-        fleet.light_fighter, FleetPerformance.LightFighter.structural_intergrity, damage_per_ship
+        fleet.light_fighter, FleetPerformance.LightFighter.structural_integrity,FleetPerformance.LightFighter.shield_power, damage_per_ship
     );
 
     let cruiser_damaged = get_damaged_ships(
-        fleet.cruiser, FleetPerformance.Cruiser.structural_intergrity, damage_per_ship
+        fleet.cruiser, FleetPerformance.Cruiser.structural_integrity,FleetPerformance.Cruiser.shield_power, damage_per_ship
     );
 
     let bs_damaged = get_damaged_ships(
-        fleet.battle_ship, FleetPerformance.BattleShip.structural_intergrity, damage_per_ship
+        fleet.battle_ship, FleetPerformance.BattleShip.structural_integrity,FleetPerformance.BattleShip.shield_power, damage_per_ship
     );
 
     let dead_damaged = get_damaged_ships(
-        fleet.death_star, FleetPerformance.Deathstar.structural_intergrity, damage_per_ship
+        fleet.death_star, FleetPerformance.Deathstar.structural_integrity,FleetPerformance.Deathstar.shield_power, damage_per_ship
     );
 
     let damaged_fleet = Fleet(
@@ -980,7 +987,7 @@ func calculate_lost_fleet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_
 
 func get_numeber_of_defences{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     defences: Defence
-) {
+) -> felt {
     let rocket = is_not_zero(defences.rocket);
     let light_laser = is_not_zero(defences.light_laser);
     let heavy_laser = is_not_zero(defences.heavy_laser);
@@ -989,7 +996,7 @@ func get_numeber_of_defences{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, ran
     let plasma_turret = is_not_zero(defences.plasma_turret);
     let small_dome = is_not_zero(defences.small_dome);
     let large_dome = is_not_zero(defences.large_dome);
-    return rocket + light_laser + heavy_laser + ion_cannon + gauss + plasma + small_dome +
+    return rocket + light_laser + heavy_laser + ion_cannon + gauss + plasma_turret + small_dome +
         large_dome;
 }
 
@@ -1012,8 +1019,8 @@ func calculate_attacker_damage{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, r
     fleet: Fleet, points_left: felt
 ) -> felt {
     let shield = get_total_fleet_shield_power(fleet);
-    let structural_intergrity = get_total_fleet_structural_integrity(fleet);
-    return shield + structural_intergrity - points_left;
+    let structural_integrity = get_total_fleet_structural_integrity(fleet);
+    return shield + structural_integrity - points_left;
 }
 
 func calculate_defender_damage{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
@@ -1074,7 +1081,7 @@ func get_fleet_on_planet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_c
 
 func get_defences_on_planet{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     planet_id: Uint256
-) -> Fleet {
+) -> Defence {
     let (game) = FleetMovements_no_game_address.read();
     let (erc721, _, _, _) = INoGame.getTokensAddresses(game);
     let (defender_addr) = IERC721.ownerOf(erc721, planet_id);
