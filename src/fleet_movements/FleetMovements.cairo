@@ -46,3 +46,11 @@ func readEspionageReport{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_c
     let res = FleetMovements.read_espionage_report(caller, mission_id);
     return (res,);
 }
+
+@external
+func sendAttackMission{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+    caller: felt, ships: Fleet, destination: Uint256
+) -> (mission_id : felt, fuel_consumption : felt) {
+    let (mission_id, fuel_consumption) = FleetMovements.send_attack_mission(caller, ships, destination);
+    return(mission_id, fuel_consumption);
+}
