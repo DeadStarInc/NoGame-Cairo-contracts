@@ -1,5 +1,6 @@
 %lang starknet
 
+from starkware.cairo.common.uint256 import Uint256
 struct BuildingQue {
     id: felt,
     lock_end: felt,
@@ -163,6 +164,7 @@ struct EspionageReport {
 }
 
 struct BattleReport {
-    ships_lost : Fleet,
-    defences_lost : Defence
+    attacker: Fleet,
+    defender: Fleet,
+    defences: Defence,
 }
