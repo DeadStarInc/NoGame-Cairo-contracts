@@ -3,6 +3,7 @@ protostar-version = "0.9.1"
 cairo-path = ["src", "lib/cairo_contracts/src"]
 disable_hint_validation = true
 
+
 [contracts]
 facilities = ["src/facilities/Facilities.cairo"]
 main = ["src/main/NoGame.cairo"]
