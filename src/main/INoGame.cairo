@@ -1,7 +1,7 @@
 %lang starknet
 
 from starkware.cairo.common.uint256 import Uint256
-from main.structs import BuildingQue, Fleet, TechLevels
+from main.structs import BuildingQue, Fleet, TechLevels, Defence
 
 @contract_interface
 namespace INoGame {
@@ -37,6 +37,15 @@ namespace INoGame {
     func getTechLevels(caller: felt) -> (result: TechLevels) {
     }
 
+    func getDefencesLevels(caller: felt) -> (res: Defence) {
+    }
+
     func getFleetLevels(caller: felt) -> (result: Fleet) {
+    }
+
+    func updateFleetLevels(caller: felt, fleet: Fleet) {
+    }
+
+    func updateDefenceLevels(caller: felt, fleet: Fleet) {
     }
 }
